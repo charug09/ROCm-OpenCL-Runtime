@@ -1745,24 +1745,19 @@ RUNTIME_ENTRY_RET(cl_mem, clCreateImage2D,
     image_row_pitch = image_width * imageFormat.getElementSize();
   }
 
-  amd::Image* image =
-      new (amdContext) amd::Image(amdContext, CL_MEM_OBJECT_IMAGE2D, flags, imageFormat,
-                                  image_width, image_height, 1, image_row_pitch, 0);
-  if (image == NULL) {
-    *not_null(errcode_ret) = CL_OUT_OF_HOST_MEMORY;
-    LogWarning("cannot allocate resources");
-    return (cl_mem)0;
-  }
+  cl_image_desc image_desc = {};
+  image_desc.image_type = CL_​MEM_​OBJECT_​IMAGE2D;
+  image_desc.image_width = image_width;
+  image_desc.image_height = image_height;
+  image_desc.image_depth = 1;
+  image_desc.image_array_size = 1;
+  image_desc.image_row_pitch = image_row_pitch;
+  image_desc.image_slice_pitch = 1;
+  image_desc.num_mip_levels = 0;
+  image_desc.num_samples = 0;
+  image_desc.mem_object = NULL;
 
-  // CL_MEM_OBJECT_ALLOCATION_FAILURE
-  if (!image->create(host_ptr)) {
-    *not_null(errcode_ret) = CL_MEM_OBJECT_ALLOCATION_FAILURE;
-    image->release();
-    return (cl_mem)0;
-  }
-
-  *not_null(errcode_ret) = CL_SUCCESS;
-  return (cl_mem)as_cl<amd::Memory>(image);
+  return clCreateImage(context, flags, image_format, &image_desc, host_ptr, errcode_ret);
 }
 RUNTIME_EXIT
 
@@ -1956,24 +1951,19 @@ RUNTIME_ENTRY_RET(cl_mem, clCreateImage3D,
     image_slice_pitch = image_row_pitch * image_height;
   }
 
-  amd::Image* image = new (amdContext)
-      amd::Image(amdContext, CL_MEM_OBJECT_IMAGE3D, flags, imageFormat, image_width, image_height,
-                 image_depth, image_row_pitch, image_slice_pitch);
-  if (image == NULL) {
-    *not_null(errcode_ret) = CL_OUT_OF_HOST_MEMORY;
-    LogWarning("cannot allocate resources");
-    return (cl_mem)0;
-  }
+  cl_image_desc image_desc = {};
+  image_desc.image_type = CL_​MEM_​OBJECT_​IMAGE3D;
+  image_desc.image_width = image_width;
+  image_desc.image_height = image_height;
+  image_desc.image_depth = image_depth;
+  image_desc.image_array_size = 1;
+  image_desc.image_row_pitch = image_row_pitch;
+  image_desc.image_slice_pitch = image_slice_pitch;
+  image_desc.num_mip_levels = 0;
+  image_desc.num_samples = 0;
+  image_desc.mem_object = NULL;
 
-  // CL_MEM_OBJECT_ALLOCATION_FAILURE
-  if (!image->create(host_ptr)) {
-    *not_null(errcode_ret) = CL_MEM_OBJECT_ALLOCATION_FAILURE;
-    image->release();
-    return (cl_mem)0;
-  }
-
-  *not_null(errcode_ret) = CL_SUCCESS;
-  return (cl_mem)as_cl<amd::Memory>(image);
+  return clCreateImage(context, flags, image_format, &image_desc, host_ptr, errcode_ret);
 }
 RUNTIME_EXIT
 
